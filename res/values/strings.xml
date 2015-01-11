@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+<string name="content"></string>
+    <string name="app_name">BytePad</string>
+    <string name="action_settings">Settings</string>
+  <string-array name="category">
+        <item>All papers</item>
+        <item>PUT</item>
+        <item>ST1</item>
+        <item>ST2</item>
+        <item>UT</item>
+    </string-array>
+<string name="get">Enter subject name or code</string>
+</resources>
