@@ -9,18 +9,29 @@ import java.util.HashMap;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.ActionBar.LayoutParams;
 import android.app.DownloadManager;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -45,14 +56,17 @@ public class MainActivity extends ListActivity {
 	String searchText;
 	public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
 	String st1;
+
 	int item_selected_position = 0, j, k = 0, click_status = 0, ifnj = 0;
 	JSONObject obj;
 	ListView list;
+	int screenHeight, screenWidth;
+	android.widget.RelativeLayout.LayoutParams params;
 	Connectivity object = new Connectivity();
 	Dialogbox dbox = new Dialogbox();
 	GetStringFromStream gsfs = new GetStringFromStream();
 	LinearLayout ins2;
-	RelativeLayout ll, ins;
+	RelativeLayout animax, ll, ll2, ins;
 	String data,
 			url = "http://silive.in/bytepad/rest/api/paper/getallpapers?query=",
 			furl, surl;
@@ -60,9 +74,28 @@ public class MainActivity extends ListActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		SharedPreferences settings = getSharedPreferences("Bytepad", 0);
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.finallylayout);
+		DisplayMetrics metrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		screenHeight = metrics.heightPixels;
+		screenWidth = metrics.widthPixels;
+		
+		if ((settings.getInt("click_status", 0) == 1)) {
+			click_status=1;
+			initialise();
+			//finalcheck();
+			
+			if (screenHeight > screenWidth) {
+			Toast.makeText(this, "Portrait hello"+find.getText().toString(), Toast.LENGTH_SHORT).show();
+			} else {
+			
+			
+				Toast.makeText(this, "Landscape hello"+find.getText().toString(), Toast.LENGTH_SHORT).show();
+			}
+		}
 		initialise();
 	}
 
@@ -70,6 +103,18 @@ public class MainActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		Log.d("Confoo changed", "Config changed");
+		// Checks the orientation of the screen
+		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
+		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+			Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	public void initialise() {
@@ -82,53 +127,33 @@ public class MainActivity extends ListActivity {
 		list = (ListView) findViewById(android.R.id.list);
 		image = (ImageView) findViewById(R.id.image);
 		ll = (RelativeLayout) findViewById(R.id.ll);
-		if (click_status == 0) {
-			ins.setY(500);
-		}
-		Log.d("Animation first ends", "Reached end of anim" + ins.getTop());
+		ll2 = ins;
 
+		animax = (RelativeLayout) findViewById(R.id.animateLayout);
+
+		if (click_status == 0) {
+
+			ins.setY(screenHeight / 3);
+
+		}
 	}
 
 	public void clicked(View view) throws HttpRetryException,
 			InterruptedException {
 
 		if (click_status == 0) {
-			final Animation animation = AnimationUtils.loadAnimation(
-					getApplicationContext(), R.anim.trans);
-			ins.startAnimation(animation);
+			ins.animate().y(10f);
+			finalcheck();
+			SharedPreferences settings = getSharedPreferences("Bytepad", 0);
+			SharedPreferences.Editor editor = settings.edit();
 
-			animation.setAnimationListener(new AnimationListener() {
-
-				@Override
-				public void onAnimationEnd(Animation arg0) {
-					// TODO Auto-generated method stub
-				    finalcheck();
-					list.setVisibility(View.VISIBLE);
-				
-					click_status = 1;
-					Log.d("Reached","Reache before view group");
-					
-				/*	ViewGroup parent = (ViewGroup) ins.getParent();
-		            parent.removeView(ins);
-		        */    Log.d("Reached","Reache after view group");
-					
-		        }
-
-				@Override
-				public void onAnimationRepeat(Animation arg0) {
-					// TODO Auto-generated method stub
-
-				}
-
-				@Override
-				public void onAnimationStart(Animation arg0) {
-					// TODO Auto-generated method stub
-
-				}
-
-			});
-
-		} 
+			editor.putInt("click_status", 1);
+			editor.commit();
+			click_status = 1;
+			list.setVisibility(View.VISIBLE);
+		} else {
+			finalcheck();
+		}
 	}
 
 	public void finalcheck() {
@@ -159,7 +184,7 @@ public class MainActivity extends ListActivity {
 		return (object.isConnected(conn));
 	}
 
-	public void startDownload(int pos) {
+	public void startDownload(int pos, Context context) {
 		String s = getFinalUrl(paper_url[pos]);
 		DownloadManager.Request request = new DownloadManager.Request(
 				Uri.parse(s));
@@ -209,11 +234,10 @@ public class MainActivity extends ListActivity {
 				HttpURLConnection connection = (HttpURLConnection) httpUrl
 						.openConnection();
 				connection.connect();
+				connection.setConnectTimeout(5000);
 				Log.d("Log log", "Connected to network");
 				in = connection.getInputStream();
 				data = getStringFromInputStream(in);
-				if (data != null)
-					Log.d("INFO_TAG", "Received data" + data);
 				try {
 					JSONArray get = new JSONArray(data);
 				} catch (Exception e) {
@@ -254,11 +278,17 @@ public class MainActivity extends ListActivity {
 					error_status = 0;
 					j++;
 				}
-				if (error_status == 1)
+				if (error_status == 1) {
+					Log.d("Reaching error status ",
+							"The visibility is " + ins.getTop()
+									+ ins.getBottom());
 					image.setVisibility(0);
-				else
-					image.setVisibility(4);
-
+				} else {
+					Log.d("Reaching error status ",
+							"The visibility is " + ins.getTop()
+									+ ins.getBottom());
+					image.setVisibility(8);
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -266,6 +296,7 @@ public class MainActivity extends ListActivity {
 			itemsView = new SimpleAdapter(getBaseContext(), items,
 					R.layout.disp, from, to);
 			list.setAdapter(itemsView);
+
 			list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 				@Override
@@ -274,7 +305,8 @@ public class MainActivity extends ListActivity {
 					// TODO Auto-generated method stub
 					Log.d("log log", "You Selected" + pos + "whose URL is "
 							+ paper_url[pos]);
-					startDownload(pos);
+
+					startDownload(pos, MainActivity.this);
 				}
 			});
 		}

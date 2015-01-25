@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mode" />
+
+    <EditText
+        android:id="@+id/pol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter mode here" />
+
+    <Button
+        android:id="@+id/Click"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Click to save" />
+
+    <TextView
+        android:id="@+id/lt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Large Text"
+        android:textSize="30dp" />
+
+</LinearLayout>
