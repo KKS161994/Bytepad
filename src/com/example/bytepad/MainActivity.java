@@ -49,7 +49,7 @@ import android.widget.Toast;
 public class MainActivity extends ListActivity {
 	Button search;
 	EditText find;
-	int check=0;
+	int check = 0;// variable for checking whether orientation has changed
 	RelativeLayout rl;
 	String array[] = new String[2000];
 	String paper_url[] = new String[2000];
@@ -83,24 +83,21 @@ public class MainActivity extends ListActivity {
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		screenHeight = metrics.heightPixels;
 		screenWidth = metrics.widthPixels;
-		
+
 		if ((settings.getInt("click_status", 0) == 1)) {
-			click_status=1;
-		
-			//finalcheck();
-	initialise();
-	list.setVisibility(View.VISIBLE);
-			
+			click_status = 1;
+
+			initialise();
+			list.setVisibility(View.VISIBLE);
+
 			if (screenHeight > screenWidth) {
-				check=1;
-				
-					finalcheck();
-				Toast.makeText(this, "Portrait "+settings.getString("edit_text", null), Toast.LENGTH_SHORT).show();
+				check = 1;
+
+				finalcheck();
 			} else {
-				check=1;
-			finalcheck();
-			
-				Toast.makeText(this, "Landscape "+settings.getString("edit_text", null), Toast.LENGTH_SHORT).show();
+				check = 1;
+				finalcheck();
+
 			}
 		}
 		initialise();
@@ -133,6 +130,7 @@ public class MainActivity extends ListActivity {
 		search = (Button) findViewById(R.id.btn1);
 		list = (ListView) findViewById(android.R.id.list);
 		image = (ImageView) findViewById(R.id.image);
+	
 		ll = (RelativeLayout) findViewById(R.id.ll);
 		ll2 = ins;
 
@@ -149,7 +147,8 @@ public class MainActivity extends ListActivity {
 			InterruptedException {
 
 		if (click_status == 0) {
-			ins.animate().y(10f);
+			image.setVisibility(View.GONE);
+			ins.animate().y(1f);
 			finalcheck();
 			SharedPreferences settings = getSharedPreferences("Bytepad", 0);
 			SharedPreferences.Editor editor = settings.edit();
@@ -168,20 +167,17 @@ public class MainActivity extends ListActivity {
 		SharedPreferences settings = getSharedPreferences("Bytepad", 0);
 		SharedPreferences.Editor editor = settings.edit();
 
-	if(check==1){
-searchText=settings.getString("edit_text", null);
-editor.remove("edit_text");
+		if (check == 1) {
+			searchText = settings.getString("edit_text", null);
+			editor.remove("edit_text");
 
-check=0;
-}
-else
-{		
-	searchText = find.getText().toString();
-editor.putString("edit_text",searchText);
-editor.commit();
-}
+			check = 0;
+		} else {
+			searchText = find.getText().toString();
+			editor.putString("edit_text", searchText);
+			editor.commit();
+		}
 		String st2 = getFinalUrl(searchText);
-		
 
 		furl = url + st2;
 		Log.d("sear", "" + searchText + " " + surl);
@@ -288,7 +284,6 @@ editor.commit();
 				while (j < l) {
 					obj = get.getJSONObject(j);
 					array[j] = obj.getString("Title").toLowerCase();
-					String f = find.getText().toString().toLowerCase();
 					String info = obj.getString("Title") + "\n"
 							+ obj.getString("Size");
 					hm = new HashMap<String, String>();

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="#ffffff"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/animateLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -13,34 +12,34 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/img"
-         android:layout_marginTop="0dp"
-       
         android:layout_below="@+id/inside2" >
 
         <RelativeLayout
             android:id="@+id/inside"
-            android:layout_width="fill_parent"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true" 
+            android:layout_width="400dp"
             android:layout_height="wrap_content"
             android:weightSum="4" >
 
             <EditText
+                android:textColorHint="#6599FF"
                 android:id="@+id/edit_text"
+                
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_weight="2"
-                android:cursorVisible="true"
-                android:textColorHint="#6599FF"
-                android:textColor="#6599FF"
                 android:hint="Enter subject name or code" />
 
             <Button
                 android:id="@+id/btn1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
                 android:layout_toEndOf="@id/edit_text"
                 android:background="@drawable/search3"
                 android:onClick="clicked" />
+
         </RelativeLayout>
 
         <ListView
@@ -63,6 +62,7 @@
     </RelativeLayout>
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/img"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
