@@ -1,4 +1,5 @@
 package com.example.bytepad;
+
 import java.io.InputStream;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -49,11 +51,13 @@ public class MainActivity extends ListActivity {
 	Connectivity object = new Connectivity();
 	Dialogbox dbox = new Dialogbox();
 	GetStringFromStream gsfs = new GetStringFromStream();
-	LinearLayout ll;
+	LinearLayout ins2;
+	RelativeLayout ll, ins;
 	String data,
 			url = "http://silive.in/bytepad/rest/api/paper/getallpapers?query=",
 			furl, surl;
 	ImageView image;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,50 +65,75 @@ public class MainActivity extends ListActivity {
 		setContentView(R.layout.finallylayout);
 		initialise();
 	}
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
 	}
+
 	public void initialise() {
 		Log.d("Reached", " On Initialise");
+		// ins = (LinearLayout) findViewById(R.id.inside);
 		find = (EditText) findViewById(R.id.edit_text);
+		ins = (RelativeLayout) findViewById(R.id.inside);
+		ins2 = (LinearLayout) findViewById(R.id.inside2);
 		search = (Button) findViewById(R.id.btn1);
 		list = (ListView) findViewById(android.R.id.list);
 		image = (ImageView) findViewById(R.id.image);
-		ll = (LinearLayout) findViewById(R.id.ll);
-		Log.d("Reached", "Reached On Initialise end");
-	}	
+		ll = (RelativeLayout) findViewById(R.id.ll);
+		if (click_status == 0) {
+			ins.setY(500);
+		}
+		Log.d("Animation first ends", "Reached end of anim" + ins.getTop());
+
+	}
+
 	public void clicked(View view) throws HttpRetryException,
 			InterruptedException {
+
 		if (click_status == 0) {
-			Animation animation = AnimationUtils.loadAnimation(
+			final Animation animation = AnimationUtils.loadAnimation(
 					getApplicationContext(), R.anim.trans);
-			ll.startAnimation(animation);
+			ins.startAnimation(animation);
+
 			animation.setAnimationListener(new AnimationListener() {
+
 				@Override
 				public void onAnimationEnd(Animation arg0) {
-					finalcheck();
+					// TODO Auto-generated method stub
+				    finalcheck();
 					list.setVisibility(View.VISIBLE);
-					Log.d("Animation ends", "Reached end of anim");
-						image.setVisibility(View.GONE);
+				
 					click_status = 1;
-				}
+					Log.d("Reached","Reache before view group");
+					
+				/*	ViewGroup parent = (ViewGroup) ins.getParent();
+		            parent.removeView(ins);
+		        */    Log.d("Reached","Reache after view group");
+					
+		        }
+
 				@Override
 				public void onAnimationRepeat(Animation arg0) {
 					// TODO Auto-generated method stub
 
 				}
+
 				@Override
 				public void onAnimationStart(Animation arg0) {
 					// TODO Auto-generated method stub
+
 				}
+
 			});
-		} else {
-			finalcheck();
-		}
+
+		} 
 	}
+
 	public void finalcheck() {
+		// ins2.setVisibility(View.VISIBLE);
+
 		searchText = find.getText().toString();
 		String st2 = getFinalUrl(searchText);
 		furl = url + st2;
@@ -168,6 +197,7 @@ public class MainActivity extends ListActivity {
 		int img = R.drawable.word;
 		String from[] = { "byt", "tv" };
 		int to[] = { R.id.byt, R.id.tv };
+
 		@Override
 		protected String doInBackground(String... params) {
 			InputStream in = null;
@@ -195,6 +225,7 @@ public class MainActivity extends ListActivity {
 			}
 			return data;
 		}
+
 		@Override
 		protected void onPostExecute(String data) {
 			// TODO Auto-generated method stub
@@ -247,12 +278,14 @@ public class MainActivity extends ListActivity {
 				}
 			});
 		}
+
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 			// TODO Auto-generated method stub
 
 			super.onProgressUpdate(values);
 		}
+
 		public String getStringFromInputStream(InputStream is) {
 			Log.e("Reached", "Reached Stringfromstream");
 			return gsfs.getString(is);
