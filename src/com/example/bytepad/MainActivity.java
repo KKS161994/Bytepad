@@ -49,6 +49,7 @@ import android.widget.Toast;
 public class MainActivity extends ListActivity {
 	Button search;
 	EditText find;
+	int check=0;
 	RelativeLayout rl;
 	String array[] = new String[2000];
 	String paper_url[] = new String[2000];
@@ -85,15 +86,21 @@ public class MainActivity extends ListActivity {
 		
 		if ((settings.getInt("click_status", 0) == 1)) {
 			click_status=1;
-			initialise();
+		
 			//finalcheck();
+	initialise();
+	list.setVisibility(View.VISIBLE);
 			
 			if (screenHeight > screenWidth) {
-			Toast.makeText(this, "Portrait hello"+find.getText().toString(), Toast.LENGTH_SHORT).show();
+				check=1;
+				
+					finalcheck();
+				Toast.makeText(this, "Portrait "+settings.getString("edit_text", null), Toast.LENGTH_SHORT).show();
 			} else {
+				check=1;
+			finalcheck();
 			
-			
-				Toast.makeText(this, "Landscape hello"+find.getText().toString(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "Landscape "+settings.getString("edit_text", null), Toast.LENGTH_SHORT).show();
 			}
 		}
 		initialise();
@@ -158,9 +165,24 @@ public class MainActivity extends ListActivity {
 
 	public void finalcheck() {
 		// ins2.setVisibility(View.VISIBLE);
+		SharedPreferences settings = getSharedPreferences("Bytepad", 0);
+		SharedPreferences.Editor editor = settings.edit();
 
-		searchText = find.getText().toString();
+	if(check==1){
+searchText=settings.getString("edit_text", null);
+editor.remove("edit_text");
+
+check=0;
+}
+else
+{		
+	searchText = find.getText().toString();
+editor.putString("edit_text",searchText);
+editor.commit();
+}
 		String st2 = getFinalUrl(searchText);
+		
+
 		furl = url + st2;
 		Log.d("sear", "" + searchText + " " + surl);
 		try {
