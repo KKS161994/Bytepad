@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import android.util.Log;
+
 class GetStringFromStream{
 public String getString(InputStream is){
 
@@ -25,7 +27,8 @@ String fetchedData="";
 		if (br != null) {
 			try {
 				br.close();
-				return fetchedData;
+		
+		return fetchedData;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -34,6 +37,3 @@ String fetchedData="";
 	return fetchedData;
 }
 }
-	
-
-

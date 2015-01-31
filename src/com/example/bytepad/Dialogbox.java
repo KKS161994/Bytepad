@@ -6,35 +6,20 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 
 public class Dialogbox {
-	@SuppressWarnings("deprecation")
-	public void dialogbox1(Context context) {
-		
-		AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-		alertDialog.setTitle("Not Connected To Internet");
-		alertDialog.setMessage("Internet connection is required");
-		alertDialog.setIcon(R.drawable.error);
-		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-			
-			
-			}
-		});
-		alertDialog.show();
+public void dialogbox3(final Context context, final ConnectivityManager conn) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Not Connected")
+        .setMessage("Internet Connection is required")
+        .setCancelable(false)
+        .setIcon(R.drawable.error)
+        .setNegativeButton("Close",new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
 	}
-	@SuppressWarnings("deprecation")
-	public void dialogbox2(final Context context,final ConnectivityManager conn) {
-		
-		AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-		alertDialog.setTitle("Not Connected To Internet");
-		
-		alertDialog.setMessage("Internet connection is required");
-		alertDialog.setIcon(R.drawable.error);
-		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-			if(new Connectivity().isConnected(conn)==false)
-			new Dialogbox().dialogbox2(context, conn);
-			}
-		});
-		alertDialog.show();
-	}
-	}
+

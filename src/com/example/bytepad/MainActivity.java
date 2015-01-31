@@ -10,17 +10,14 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.ActionBar.LayoutParams;
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Rect;
-import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -28,26 +25,29 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Animation.AnimationListener;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ListActivity {
-	Button search;
+	Button search, ttbt;
+	FrameLayout fl;
 	EditText find;
 	int check = 0;// variable for checking whether orientation has changed
 	RelativeLayout rl;
@@ -62,7 +62,6 @@ public class MainActivity extends ListActivity {
 	JSONObject obj;
 	ListView list;
 	int screenHeight, screenWidth;
-	android.widget.RelativeLayout.LayoutParams params;
 	Connectivity object = new Connectivity();
 	Dialogbox dbox = new Dialogbox();
 	GetStringFromStream gsfs = new GetStringFromStream();
@@ -73,12 +72,42 @@ public class MainActivity extends ListActivity {
 			furl, surl;
 	ImageView image;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		SharedPreferences settings = getSharedPreferences("Bytepad", 0);
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.finallylayout);
+		SharedPreferences set = getSharedPreferences("ToolTips", 0);
+		SharedPreferences.Editor edit = set.edit();
+		if (set.getInt("TipsDone", 0) == 0) {
+			LayoutInflater inflater = getLayoutInflater();
+			getWindow().addContentView(
+					inflater.inflate(R.layout.tiptools, null),
+					new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.FILL_PARENT,
+							ViewGroup.LayoutParams.FILL_PARENT));
+			edit.putInt("TipsDone", 1);
+			edit.commit();
+			animax = (RelativeLayout) findViewById(R.id.animateLayout);
+
+			fl = (FrameLayout) findViewById(R.id.fl);
+			fl.setAlpha((float) 0.6);
+			animax.setAlpha((float) 0.2);
+
+			ttbt = (Button) findViewById(R.id.ttbt);
+			ttbt.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					animax.setAlpha((float) 1.0);
+					fl.removeAllViews();
+					fl.setVisibility(View.GONE);
+				}
+			});
+		}
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		screenHeight = metrics.heightPixels;
@@ -101,12 +130,57 @@ public class MainActivity extends ListActivity {
 			}
 		}
 		initialise();
+		find.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				// TODO Auto-generated method stub
+				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+					try {
+						clicked(findViewById(R.id.btn1));
+					} catch (HttpRetryException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		new AlertDialog.Builder(this)
+				.setTitle("Exit")
+				.setMessage("Do you really want to exit?")
+				.setPositiveButton("Yes",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// TODO Auto-generated method stub
+								finish();
+							}
+						}).setNegativeButton("No", null).show();
 	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
+	}
+
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return true;
 	}
 
 	@Override
@@ -123,54 +197,55 @@ public class MainActivity extends ListActivity {
 
 	public void initialise() {
 		Log.d("Reached", " On Initialise");
-		// ins = (LinearLayout) findViewById(R.id.inside);
 		find = (EditText) findViewById(R.id.edit_text);
 		ins = (RelativeLayout) findViewById(R.id.inside);
 		ins2 = (LinearLayout) findViewById(R.id.inside2);
 		search = (Button) findViewById(R.id.btn1);
 		list = (ListView) findViewById(android.R.id.list);
 		image = (ImageView) findViewById(R.id.image);
-	
 		ll = (RelativeLayout) findViewById(R.id.ll);
 		ll2 = ins;
 
 		animax = (RelativeLayout) findViewById(R.id.animateLayout);
 
-		if (click_status == 0) {
-
-			ins.setY(screenHeight / 3);
-
-		}
+		if (click_status == 0)
+			ins.setY((float) (screenHeight / 2.75));
 	}
 
 	public void clicked(View view) throws HttpRetryException,
 			InterruptedException {
-
-		if (click_status == 0) {
-			image.setVisibility(View.GONE);
-			ins.animate().y(1f);
-			finalcheck();
-			SharedPreferences settings = getSharedPreferences("Bytepad", 0);
-			SharedPreferences.Editor editor = settings.edit();
-
-			editor.putInt("click_status", 1);
-			editor.commit();
-			click_status = 1;
-			list.setVisibility(View.VISIBLE);
+		// COnnectivity is checked at every on clicked and dialogbox2 was
+		// removed
+		if (connectivitycheck() == false) {
+			Log.d("error", "connectivity");
+			ConnectivityManager conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			dbox.dialogbox3(MainActivity.this, conn);
 		} else {
-			finalcheck();
+			if (click_status == 0) {
+				image.setVisibility(View.GONE);
+				ins.animate().y(1f);
+				finalcheck();
+				SharedPreferences settings = getSharedPreferences("Bytepad", 0);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putInt("click_status", 1);
+				editor.commit();
+				click_status = 1;
+				list.setVisibility(View.VISIBLE);
+				// list.setAlpha( (float) 0.7);
+			} else {
+				finalcheck();
+			}
 		}
 	}
 
 	public void finalcheck() {
-		// ins2.setVisibility(View.VISIBLE);
+		// list.setAlpha( (float) 0.7);
 		SharedPreferences settings = getSharedPreferences("Bytepad", 0);
 		SharedPreferences.Editor editor = settings.edit();
 
 		if (check == 1) {
 			searchText = settings.getString("edit_text", null);
 			editor.remove("edit_text");
-
 			check = 0;
 		} else {
 			searchText = find.getText().toString();
@@ -187,14 +262,24 @@ public class MainActivity extends ListActivity {
 			if (connectivitycheck() == false) {
 				Log.d("error", "connectivity");
 				ConnectivityManager conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-				dbox.dialogbox2(MainActivity.this, conn);
+				dbox.dialogbox3(MainActivity.this, conn);
 			} else
 				new getData().execute(url);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.e("Log log", "Could not create object" + e.toString());
 		}
 
+	}
+
+	public int checkextension(String title) {
+		int i = 0, l = title.length();
+		String k;
+		while (title.charAt(i) != '.')
+			i++;
+		k = title.substring(i + 1, l);
+		if (k.equals("pdf"))
+			return 1;
+		return 0;
 	}
 
 	public boolean connectivitycheck() {
@@ -238,8 +323,8 @@ public class MainActivity extends ListActivity {
 		List<HashMap<String, String>> items = new ArrayList<HashMap<String, String>>();
 		SimpleAdapter itemsView;
 		int img = R.drawable.word;
-		String from[] = { "byt", "tv" };
-		int to[] = { R.id.byt, R.id.tv };
+		String from[] = { "byt", "tv", "siz" };
+		int to[] = { R.id.byt, R.id.tv, R.id.siz };
 
 		@Override
 		protected String doInBackground(String... params) {
@@ -256,6 +341,10 @@ public class MainActivity extends ListActivity {
 				Log.d("Log log", "Connected to network");
 				in = connection.getInputStream();
 				data = getStringFromInputStream(in);
+				Log.d("Getting Hash Map","Loading Hash Maps");
+
+				new HashMapCreator().jsonToMap(data);
+				
 				try {
 					JSONArray get = new JSONArray(data);
 				} catch (Exception e) {
@@ -274,7 +363,7 @@ public class MainActivity extends ListActivity {
 			HashMap<String, String> hm = null;
 			if (ifnj == 1) {
 				ConnectivityManager conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-				dbox.dialogbox2(MainActivity.this, conn);
+				dbox.dialogbox3(MainActivity.this, conn);
 				ifnj = 0;
 			}
 			int error_status = 1;
@@ -283,12 +372,19 @@ public class MainActivity extends ListActivity {
 				int l = get.length();
 				while (j < l) {
 					obj = get.getJSONObject(j);
+
 					array[j] = obj.getString("Title").toLowerCase();
-					String info = obj.getString("Title") + "\n"
-							+ obj.getString("Size");
+					String info = obj.getString("Title");
+
 					hm = new HashMap<String, String>();
-					hm.put("byt", (Integer.toString(img)));
-					hm.put("tv", info);
+					if (checkextension(obj.getString("Title")) == 1)
+						hm.put("byt", (Integer.toString(R.drawable.pdf)));
+					else
+						hm.put("byt", (Integer.toString(img)));
+
+					hm.put("siz", obj.getString("Size"));
+					hm.put("tv", obj.getString("ExamCategory") + "-"
+							+ new Caps().getCaps(info));
 					items.add(hm);
 					paper_title[k] = obj.getString("Title");
 					paper_url[k++] = obj.getString("URL");
@@ -315,7 +411,6 @@ public class MainActivity extends ListActivity {
 			list.setAdapter(itemsView);
 
 			list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1,
 						int pos, long arg3) {
