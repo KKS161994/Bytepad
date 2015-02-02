@@ -7,33 +7,33 @@ import java.io.InputStreamReader;
 
 import android.util.Log;
 
-class GetStringFromStream{
-public String getString(InputStream is){
+class GetStringFromStream {
+	public String getString(InputStream is) {
 
-	BufferedReader br = null;
-	StringBuilder sb = new StringBuilder();
-String fetchedData="";
-	String line;
-	try {
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+		String fetchedData = "";
+		String line;
+		try {
 
-		br = new BufferedReader(new InputStreamReader(is));
-		while ((line = br.readLine()) != null) {
-			sb.append(line);
-		}
-		fetchedData = sb.toString();
-	} catch (IOException e) {
-		e.printStackTrace();
-	} finally {
-		if (br != null) {
-			try {
-				br.close();
-		
-		return fetchedData;
-			} catch (IOException e) {
-				e.printStackTrace();
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+			fetchedData = sb.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+
+					return fetchedData;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+		return fetchedData;
 	}
-	return fetchedData;
-}
 }

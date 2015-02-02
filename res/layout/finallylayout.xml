@@ -47,7 +47,17 @@
                 android:onClick="clicked" />
 
         </RelativeLayout>
-
+<TextView 
+    android:layout_marginLeft="50dp"
+    android:layout_marginRight="50dp"
+    android:layout_below="@+id/inside"
+    android:layout_width="fill_parent"
+    android:padding="20dp"
+    android:id="@+id/pupna"
+    android:layout_height="wrap_content"
+    android:text="PUT 2013 Papers are now availabale"
+    android:background="#FFF0FA"
+    />
         <ListView
             android:id="@android:id/list"
             android:layout_width="fill_parent"

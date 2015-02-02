@@ -1111,7 +1111,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f090002;
         public static final int action_menu_presenter=0x7f090003;
         public static final int action_mode_close_button=0x7f090024;
-        public static final int action_settings=0x7f090049;
+        public static final int action_settings=0x7f09004a;
         public static final int activity_chooser_view_content=0x7f090025;
         public static final int always=0x7f09000f;
         public static final int animateLayout=0x7f09003f;
@@ -1129,13 +1129,13 @@ containing a value of this type.
         public static final int end=0x7f090017;
         public static final int expand_activities_button=0x7f090026;
         public static final int expanded_menu=0x7f09002c;
-        public static final int fl=0x7f090047;
+        public static final int fl=0x7f090048;
         public static final int home=0x7f090000;
         public static final int homeAsUp=0x7f09000a;
         public static final int icon=0x7f09002a;
         public static final int ifRoom=0x7f090011;
         public static final int image=0x7f090027;
-        public static final int imageView1=0x7f090046;
+        public static final int imageView1=0x7f090047;
         public static final int img=0x7f090041;
         public static final int inside=0x7f090043;
         public static final int inside2=0x7f090042;
@@ -1148,6 +1148,7 @@ containing a value of this type.
         public static final int normal=0x7f090007;
         public static final int progress_circular=0x7f090004;
         public static final int progress_horizontal=0x7f090005;
+        public static final int pupna=0x7f090046;
         public static final int radio=0x7f09002f;
         public static final int search_badge=0x7f090032;
         public static final int search_bar=0x7f090031;
@@ -1169,7 +1170,7 @@ containing a value of this type.
         public static final int tabMode=0x7f090008;
         public static final int title=0x7f09002b;
         public static final int top_action_bar=0x7f090020;
-        public static final int ttbt=0x7f090048;
+        public static final int ttbt=0x7f090049;
         public static final int tv=0x7f09003d;
         public static final int up=0x7f090021;
         public static final int useLogo=0x7f09000e;
