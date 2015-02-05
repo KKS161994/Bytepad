@@ -57,7 +57,7 @@ public class MainActivity extends ListActivity {
 	String searchText;
 	public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
 	String st1;
-TextView pupna;
+
 	int item_selected_position = 0, j, k = 0, click_status = 0, ifnj = 0;
 	JSONObject obj;
 	ListView list;
@@ -79,7 +79,35 @@ TextView pupna;
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.finallylayout);
+		SharedPreferences set = getSharedPreferences("ToolTips", 0);
+		SharedPreferences.Editor edit = set.edit();
+		if (set.getInt("TipsDone", 0) == 0) {
+			LayoutInflater inflater = getLayoutInflater();
+			getWindow().addContentView(
+					inflater.inflate(R.layout.tiptools, null),
+					new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.FILL_PARENT,
+							ViewGroup.LayoutParams.FILL_PARENT));
+			edit.putInt("TipsDone", 1);
+			edit.commit();
+			animax = (RelativeLayout) findViewById(R.id.animateLayout);
 
+			fl = (FrameLayout) findViewById(R.id.fl);
+			fl.setAlpha((float) 0.6);
+			animax.setAlpha((float) 0.2);
+
+			ttbt = (Button) findViewById(R.id.ttbt);
+			ttbt.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					animax.setAlpha((float) 1.0);
+					fl.removeAllViews();
+					fl.setVisibility(View.GONE);
+				}
+			});
+		}
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
 		screenHeight = metrics.heightPixels;
@@ -175,7 +203,6 @@ TextView pupna;
 		search = (Button) findViewById(R.id.btn1);
 		list = (ListView) findViewById(android.R.id.list);
 		image = (ImageView) findViewById(R.id.image);
-		pupna=(TextView)findViewById(R.id.pupna);
 		ll = (RelativeLayout) findViewById(R.id.ll);
 		ll2 = ins;
 
@@ -189,38 +216,23 @@ TextView pupna;
 			InterruptedException {
 		// COnnectivity is checked at every on clicked and dialogbox2 was
 		// removed
-
 		if (connectivitycheck() == false) {
 			Log.d("error", "connectivity");
 			ConnectivityManager conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			dbox.dialogbox3(MainActivity.this, conn);
 		} else {
-
 			if (click_status == 0) {
-				searchText = find.getText().toString();
-				if (searchText.matches("")) {
-					Toast.makeText(MainActivity.this, "You left subject name blank",
-							Toast.LENGTH_SHORT).show();
-							list.setVisibility(View.INVISIBLE);
-	pupna.setVisibility(View.VISIBLE);
-				}
-
-				else {
-					pupna.setVisibility(View.GONE);
-					image.setVisibility(View.GONE);
-					ins.animate().y(1f);
-					finalcheck();
-					SharedPreferences settings = getSharedPreferences(
-							"Bytepad", 0);
-					SharedPreferences.Editor editor = settings.edit();
-					editor.putInt("click_status", 1);
-					editor.commit();
-					click_status = 1;
-					list.setVisibility(View.VISIBLE);
-					// list.setAlpha( (float) 0.7);
-				}
+				image.setVisibility(View.GONE);
+				ins.animate().y(1f);
+				finalcheck();
+				SharedPreferences settings = getSharedPreferences("Bytepad", 0);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putInt("click_status", 1);
+				editor.commit();
+				click_status = 1;
+				list.setVisibility(View.VISIBLE);
+				// list.setAlpha( (float) 0.7);
 			} else {
-				pupna.setVisibility(View.GONE);
 				finalcheck();
 			}
 		}
@@ -237,33 +249,26 @@ TextView pupna;
 			check = 0;
 		} else {
 			searchText = find.getText().toString();
-
 			editor.putString("edit_text", searchText);
 			editor.commit();
 		}
 		String st2 = getFinalUrl(searchText);
-		if (searchText.matches("")) {
-			list.setVisibility(View.INVISIBLE);
-			Toast.makeText(MainActivity.this, "You left subject name blank",
-					Toast.LENGTH_SHORT).show();
-		} else {
-			list.setVisibility(View.VISIBLE);
-			image.setVisibility(View.INVISIBLE);
-			furl = url + st2;
-			Log.d("sear", "" + searchText + " " + surl);
-			try {
-				j = 0;
-				k = 0;
-				if (connectivitycheck() == false) {
-					Log.d("error", "connectivity");
-					ConnectivityManager conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-					dbox.dialogbox3(MainActivity.this, conn);
-				} else
-					new getData().execute(url);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+
+		furl = url + st2;
+		Log.d("sear", "" + searchText + " " + surl);
+		try {
+			j = 0;
+			k = 0;
+			if (connectivitycheck() == false) {
+				Log.d("error", "connectivity");
+				ConnectivityManager conn = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+				dbox.dialogbox3(MainActivity.this, conn);
+			} else
+				new getData().execute(url);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	public int checkextension(String title) {
@@ -336,10 +341,10 @@ TextView pupna;
 				Log.d("Log log", "Connected to network");
 				in = connection.getInputStream();
 				data = getStringFromInputStream(in);
-				Log.d("Getting Hash Map", "Loading Hash Maps");
+				Log.d("Getting Hash Map","Loading Hash Maps");
 
 				new HashMapCreator().jsonToMap(data);
-
+				
 				try {
 					JSONArray get = new JSONArray(data);
 				} catch (Exception e) {
@@ -408,39 +413,12 @@ TextView pupna;
 			list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1,
-						final int pos, long arg3) {
+						int pos, long arg3) {
 					// TODO Auto-generated method stub
 					Log.d("log log", "You Selected" + pos + "whose URL is "
 							+ paper_url[pos]);
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							MainActivity.this);
-					builder.setTitle("Click to downlaod")
-							.setMessage("Do You Want to download")
-							.setCancelable(false)
-
-							.setPositiveButton("Not Now",
-									new DialogInterface.OnClickListener() {
-
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											// TODO Auto-generated method stub
-
-										}
-									});
-					builder.setNegativeButton("Download",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-									startDownload(pos, MainActivity.this);
-
-								}
-							});
-					AlertDialog alert = builder.create();
-					alert.show();
-
+					startDownload(pos, MainActivity.this);
 				}
 			});
 		}
